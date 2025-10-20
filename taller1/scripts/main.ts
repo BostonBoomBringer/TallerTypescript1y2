@@ -1,25 +1,43 @@
-import { series } from './data.js';
-import { Serie } from './serie.js';
+import { series } from "./data.js";
 
-let seriesTbody: HTMLElement = document.getElementById('series')!;
-let averageSeasonsElm: HTMLElement = document.getElementById('average-seasons')!;
+const seriesTbody: HTMLElement = document.getElementById("series-tbody")!;
+const averageElm: HTMLElement = document.getElementById("average")!;
+const detailContainer: HTMLElement = document.getElementById("serie-detail")!;
 
-renderSeriesTable(series);
-averageSeasonsElm.innerHTML = `${getAverageSeasons(series)}`;
+mostrarSeries(series);
+averageElm.innerHTML = `Seasons average: ${getAverageSeasons(series)}`;
 
-function renderSeriesTable(series: Serie[]): void {
-  series.forEach(s => {
-    let trElement = document.createElement("tr");
-    trElement.innerHTML = `<td>${s.id}</td>
-                           <td><a href="${s.webpage}" target="_blank">${s.name}</a></td>
-                           <td>${s.channel}</td>
-                           <td>${s.seasons}</td>`;
-    seriesTbody.appendChild(trElement);
+function mostrarSeries(series: any[]): void {
+  series.forEach((s) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${s.id}</td>
+      <td class="text-primary text-decoration-underline" style="cursor:pointer">${s.name}</td>
+      <td>${s.channel}</td>
+      <td>${s.seasons}</td>
+    `;
+
+    // Al hacer clic, muestra el detalle
+    tr.querySelector("td:nth-child(2)")!.addEventListener("click", () => mostrarDetalle(s));
+
+    seriesTbody.appendChild(tr);
   });
 }
 
-function getAverageSeasons(series: Serie[]): number {
-  let totalSeasons: number = 0;
-  series.forEach(s => totalSeasons += s.seasons);
+function getAverageSeasons(series: any[]): number {
+  const totalSeasons = series.reduce((sum, s) => sum + s.seasons, 0);
   return totalSeasons / series.length;
+}
+
+function mostrarDetalle(serie: any): void {
+  detailContainer.innerHTML = `
+    <div class="card" style="width: 18rem;">
+      <img src="${serie.image}" class="card-img-top" alt="${serie.name}">
+      <div class="card-body">
+        <h5 class="card-title">${serie.name}</h5>
+        <p class="card-text">${serie.description}</p>
+        <a href="${serie.link}" target="_blank" class="btn btn-primary">Ver más</a>
+      </div>
+    </div>
+  `;
 }
